@@ -480,6 +480,8 @@ start_hadoop() {
     -h controller \
     --net $network_name \
     -p "8088:8088" \
+    -p "8188:8188" \
+    -p "19888:19888" \
     -p "50070:50070" \
     -e "CONF_CONTROLLER_HOSTNAME=controller" \
     -d \
@@ -549,7 +551,7 @@ shell_init() {
 }
 
 console() {
-  start_container $controller_node_name console \
+    start_container $controller_node_name console \
     -it \
     --rm \
     --net hadoop-net \
