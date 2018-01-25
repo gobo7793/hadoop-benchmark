@@ -7,11 +7,11 @@ CONFIG=masterthesis
 export CONFIG
 CLUSTERSH="$DIR/cluster.sh"
 
-(docker-machine ls -q | grep '^local-hadoop-controller$') > /dev/null
-if [[ $? -eq 0 ]]
-then
-    eval $(docker-machine env --swarm local-hadoop-controller)
-fi
+#(docker-machine ls -q | grep '^local-hadoop-controller$') > /dev/null
+#if [[ $? -eq 0 ]]
+#then
+#    eval $(docker-machine env --swarm local-hadoop-controller)
+#fi
 
 cd "$DIR"
 
@@ -100,19 +100,19 @@ stop_machine(){
 start_node(){
     log "Starting Node: compute-$1"
     
-    docker start compute-$1
+    docker $(docker-machine config local-hadoop-compute-"$1") start compute-$1
 }
 
 stop_node(){
     log "Stopping Node: compute-$1"
     
-    docker stop compute-$1
+    docker $(docker-machine config local-hadoop-compute-"$1") stop compute-$1
 }
 
 start_net(){
     log "Enable network adapter of node: compute-$1"
     
-    docker network connect hadoop-net compute-$1
+    docker $(docker-machine config local-hadoop-compute-"$1") network connect hadoop-net compute-$1
 #    vboxmanage controlvm local-hadoop-compute-$1 nic1 nat
 #    vboxmanage controlvm local-hadoop-compute-$1 nic2 hostonly vboxnet0
 }
@@ -120,7 +120,7 @@ start_net(){
 stop_net(){
     log "Disable network adapter of node: compute-$1"
     
-    docker network disconnect hadoop-net compute-$1
+    docker $(docker-machine config local-hadoop-compute-"$1") network disconnect hadoop-net compute-$1
 #    vboxmanage controlvm local-hadoop-compute-$1 nic1 null
 #    vboxmanage controlvm local-hadoop-compute-$1 nic2 null
 }
@@ -147,8 +147,8 @@ hadoop_console(){
     log "Using hadoop console command: $@"
     
     #./cluster.sh -q run-controller "$@"
-    #docker $(docker-machine config local-hadoop-controller) exec controller "$@"
-    docker exec controller "$@"
+    docker $(docker-machine config local-hadoop-controller) exec controller "$@"
+    #docker exec controller "$@"
 }
 
 start(){
