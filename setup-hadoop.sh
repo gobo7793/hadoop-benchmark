@@ -20,7 +20,9 @@ force="false"
 debug="true"
 
 log() {
-  echo "[$script_name]: $@"
+  if [[ "$debug" == "true" ]]; then
+    echo "[$script_name]: $@"
+  fi
 }
 
 debug() {
@@ -280,10 +282,10 @@ cat <<EOM
 Usage: $0 [OPTIONS] COMMAND
 
 Options:
+    -c, --config            Use the given config
     -f, --force             Use '-f' in docker commands where applicable
     -h, --help              Prints this help
     -q, --quiet             Do not print which commands are executed
-    -c, --config            Use the given config
 
 Commands:
     start                   starting cluster+hadoop
@@ -323,14 +325,14 @@ while [[ -z $command ]]; do
             command=print_help
             break
             ;;
+        -q|--quiet)
+            #log "Quiet output enabled"
+            debug="false"
+            shift
+            ;;
         -f|--force)
             log "Forcing docker commands if available"
             force="true"
-            shift
-            ;;
-        -q|--quiet)
-            log "Quiet output enabled"
-            debug='false'
             shift
             ;;
         -c|--config)
