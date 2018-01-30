@@ -87,6 +87,12 @@ destroy_hadoop(){
     docker rmi hadoop-benchmark/self-balancing-example
 }
 
+ls_hadoop(){
+    log "List running hadoop docker container"
+    
+    docker $(docker-machine config --swarm local-hadoop-controller) ps
+}
+
 start_machine(){
     log "Starting docker-machine: local-hadoop-compute-$1"
     
@@ -109,6 +115,12 @@ stop_node(){
     log "Stopping Node: compute-$1"
     
     docker $(docker-machine config local-hadoop-compute-"$1") stop compute-$1
+}
+
+info_node(){
+    log "Inspecting Node: compute-$1"
+    
+    docker $(docker-machine config local-hadoop-compute-"$1") inspect compute-$1
 }
 
 start_net(){
@@ -169,7 +181,7 @@ stop(){
     if [[ $1 == '-s' ]]; then
         log "shutdown computer"
         
-        shutdown -P now
+        systemctl poweroff
     fi
 }
 
@@ -227,6 +239,14 @@ hadoop_control(){
             ;;
         destroy)
             destroy_hadoop
+            ;;
+        info)
+            if [[ -z "$node" ]]
+            then
+                ls_hadoop
+            else
+                info_node $node
+            fi
             ;;
         *)
             error "hadoop $cmd: unknown command or argument"
@@ -296,9 +316,10 @@ Commands:
     cluster stop [node-id]  stopping hadoop or the given machine
     cluster destroy         destroys the cluster
     
-    hadoop start [node-id]  starting  hadoop or the given node
+    hadoop start [node-id]  starting hadoop or the given node
     hadoop stop [node-id]   stopping hadoop or the given node
     hadoop destroy          destroys the cluster
+    hadoop info [node-id]   list running containers or node container details
     
     net start <node-id>     enables networking interfaces on the given node
     net stop <node-id>      disables networking interfaces on the given node
