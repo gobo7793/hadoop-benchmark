@@ -8,7 +8,7 @@ case "$1" in
     echo $@ | tr ' ' '\n' > $HIBENCH_HOME/conf/benchmarks.lst
     echo "Running benchmarks:"
     cat $HIBENCH_HOME/conf/benchmarks.lst
-    $HIBENCH_HOME/bin/run-all.sh
+    $HIBENCH_HOME/bin/run_all.sh
   ;;
   *)
     exec "$@"
