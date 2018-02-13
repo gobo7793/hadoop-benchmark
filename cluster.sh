@@ -87,6 +87,8 @@ run_docker() {
 wait_for_port() {
   ip=$1
   port=$2
+  
+  sleep 15
 
   while ! nc -z $ip $port > /dev/null; do
     log "Waiting for $ip:$port ..."
