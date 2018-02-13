@@ -11,6 +11,7 @@ ADD hadoop-conf/* /usr/local/hadoop/etc/hadoop/
 ADD self-balancing /self-balancing
 ADD capacity-scheduler.xml /usr/local/hadoop/etc/hadoop/
 
+ADD before-start.sh /
 ADD after-start.sh /
 ADD before-stop.sh /
 
