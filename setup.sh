@@ -129,10 +129,30 @@ stop_net(){
     docker $(docker-machine config local-hadoop-compute-"$1") network disconnect hadoop-net compute-$1
 }
 
-hadoop_console(){
+hadoop_cmd(){
     log "Using hadoop console command: $@"
     
     docker $(docker-machine config local-hadoop-controller) exec controller "$@"
+}
+
+console(){
+    log "Enter console connected to the cluster"
+    
+    do_clustersh "console"
+}
+
+hdfs_download(){
+    log "Downloading file from HDFS: $@"
+    
+    do_clustersh "hdfs-download $@"
+}
+
+shell_init(){
+    do_clustersh "shell-init"
+}
+
+connect_info(){
+    do_clustersh "connect-info"
 }
 
 start(){
@@ -147,12 +167,6 @@ stop(){
     
     stop_hadoop
     stop_cluster
-    
-    if [[ $1 == '-s' ]]; then
-        log "shutdown computer"
-        
-        systemctl poweroff
-    fi
 }
 
 cluster_control(){
@@ -255,8 +269,7 @@ Options:
 
 Commands:
     start                   starting cluster+hadoop
-    stop [-s]               stopping hadoop+cluster and
-                            optionally shutdowns the computer (needs sudo)
+    stop                    stopping hadoop+cluster
     
     cluster start [node-id] starting cluster or the given machine
     cluster stop [node-id]  stopping hadoop or the given machine
@@ -271,6 +284,12 @@ Commands:
     net stop <node-id>      disables networking interfaces on the given node
     
     cmd <cmd>               executes the given command on hadoop controller
+    
+    console                 starts a console container connected to the cluster
+    hdfsdl <file>           download the file from HDFS to current directory
+    shinit                  shows info to init the current shell to the cluster
+                              usefull as 'eval \$($0 shell-init)'
+    conninfo                shows connection infos to the cluster
 EOM
 }
 
@@ -324,7 +343,23 @@ while [[ -z $command ]]; do
             break
             ;;
         cmd)
-            command=hadoop_console
+            command=hadoop_cmd
+            break
+            ;;
+        console)
+            command=console
+            break
+            ;;
+        hdfsdl)
+            command=hdfs_download
+            break
+            ;;
+        shinit)
+            command=shell_init
+            break
+            ;;
+        conninfo)
+            command=connection_info
             break
             ;;
         *)
