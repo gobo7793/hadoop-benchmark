@@ -3,7 +3,7 @@ set -e
 source $(dirname $0)/../common.sh
 
 # benchmark settings
-ALL_BENCHMARKS="wordcount sort terasort sleep"
+ALL_BENCHMARKS="micro.wordcount micro.sort micro.terasort micro.sleep"
 
 base=$(dirname "$(cd "$(dirname "$0")"; pwd)/$(basename "$0")")
 

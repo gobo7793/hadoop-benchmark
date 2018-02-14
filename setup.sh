@@ -7,12 +7,6 @@ CONFIG=masterthesis
 export CONFIG
 CLUSTERSH="$DIR/cluster.sh"
 
-#(docker-machine ls -q | grep '^local-hadoop-controller$') > /dev/null
-#if [[ $? -eq 0 ]]
-#then
-#    eval $(docker-machine env --swarm local-hadoop-controller)
-#fi
-
 cd "$DIR"
 
 declare -r script_name="$(basename $0)"
@@ -127,42 +121,18 @@ start_net(){
     log "Enable network adapter of node: compute-$1"
     
     docker $(docker-machine config local-hadoop-compute-"$1") network connect hadoop-net compute-$1
-#    vboxmanage controlvm local-hadoop-compute-$1 nic1 nat
-#    vboxmanage controlvm local-hadoop-compute-$1 nic2 hostonly vboxnet0
 }
 
 stop_net(){
     log "Disable network adapter of node: compute-$1"
     
     docker $(docker-machine config local-hadoop-compute-"$1") network disconnect hadoop-net compute-$1
-#    vboxmanage controlvm local-hadoop-compute-$1 nic1 null
-#    vboxmanage controlvm local-hadoop-compute-$1 nic2 null
-}
-
-start_mapreduce_examples(){
-    log "Starting benchmark mapreduce example: $1"
-    
-    $DIR/benchmarks/hadoop-mapreduce-examples/run.sh "$@"
-}
-
-start_hibench(){
-    log "Starting Intel HiBench benchmarks"
-    
-    $DIR/benchmarks/hibench/run.sh
-}
-
-start_swim(){
-    log "Starting SWIM jobs"
-    
-    $DIR/benchmarks/swim/run.sh
 }
 
 hadoop_console(){
     log "Using hadoop console command: $@"
     
-    #./cluster.sh -q run-controller "$@"
     docker $(docker-machine config local-hadoop-controller) exec controller "$@"
-    #docker exec controller "$@"
 }
 
 start(){
@@ -273,30 +243,6 @@ networking_control(){
     esac
 }
 
-benchmark_control(){
-    bench=$1
-    shift
-    
-    case "$bench" in
-        mapreduce)
-            start_mapreduce_examples "$@"
-            ;;
-        pi)
-            start_mapreduce_examples "pi" "20" "1000"
-            ;;
-        hibench)
-            start_hibench
-            ;;
-        swim)
-            start_swim
-            ;;
-        *)
-            error "bench $bench: unknown command or argument"
-            print_help
-            ;;
-    esac
-}
-
 print_help(){
 cat <<EOM
 Usage: $0 [OPTIONS] COMMAND
@@ -324,13 +270,6 @@ Commands:
     net start <node-id>     enables networking interfaces on the given node
     net stop <node-id>      disables networking interfaces on the given node
     
-    bench                   executes the given benchmark:
-        mapreduce [args]    runs mapreduce example programs or
-                              no args to list all available examples
-        pi                  runs pi calculation mapreduce example
-        hibench             runs Intel HiBench benchmarks
-        swim                runs the SWIM jobs
-    
     cmd <cmd>               executes the given command on hadoop controller
 EOM
 }
@@ -347,7 +286,6 @@ while [[ -z $command ]]; do
             break
             ;;
         -q|--quiet)
-            #log "Quiet output enabled"
             debug="false"
             shift
             ;;
@@ -383,10 +321,6 @@ while [[ -z $command ]]; do
             ;;
         net)
             command=networking_control
-            break
-            ;;
-        bench)
-            command=benchmark_control
             break
             ;;
         cmd)
