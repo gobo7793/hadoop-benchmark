@@ -81,16 +81,16 @@ while [[ -z $command ]]; do
             shift
             ;;
         mapreduce)
-            command=start_mapreduce_examples "$@"
+            command="start_mapreduce_examples $@"
             ;;
         pi)
-            command=start_mapreduce_examples "pi" "20" "1000"
+            command="start_mapreduce_examples pi 20 1000"
             ;;
         hibench)
-            command=start_hibench "$@"
+            command="start_hibench $@"
             ;;
         swim)
-            command=start_swim
+            command="start_swim"
             ;;
         *)
             error "$1: unknown benchmark or argument"

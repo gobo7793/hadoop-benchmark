@@ -151,7 +151,7 @@ shell_init(){
     do_clustersh "shell-init"
 }
 
-connect_info(){
+connection_info(){
     do_clustersh "connect-info"
 }
 
