@@ -10,4 +10,4 @@ docker $controller_conn run \
   -h hadoop-mapreduce-examples \
   hadoop-benchmark/self-balancing-mt \
   run \
-  hadoop jar /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar "$@"
+  hadoop jar /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-2.7.1.jar "$@"

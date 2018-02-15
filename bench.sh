@@ -23,6 +23,12 @@ error() {
   echo >&2 "[$script_name]: $@"
 }
 
+start_jobclient_tests(){
+    log "Starting benchmark jobclient test: $1"
+    
+    $DIR/benchmarks/hadoop-jobclient-tests/run.sh "$@"
+}
+
 start_mapreduce_examples(){
     log "Starting benchmark mapreduce example: $1"
     
@@ -53,6 +59,8 @@ Commands:
     mapreduce [args]        runs mapreduce example programs or
                               no args to list all available examples
     pi                      runs pi calculation mapreduce example
+    jobclient [args]        runs jobclient test programs or
+                              no args to list all available tests
     hibench [workloads]     runs Intel HiBench benchmarks with given workloads
                               see github for list of all workloads
     swim                    runs the SWIM jobs
@@ -86,6 +94,10 @@ while [[ -z $command ]]; do
             ;;
         pi)
             command="start_mapreduce_examples pi 20 1000"
+            ;;
+        jobclient)
+            shift
+            command="start_jobclient_tests $@"
             ;;
         hibench)
             shift
