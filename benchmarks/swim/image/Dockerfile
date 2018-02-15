@@ -1,4 +1,4 @@
-FROM hadoop-benchmark/hadoop
+FROM hadoop-benchmark/self-balancing-mt
 MAINTAINER Bo ZHANG <bo.zhang@inria.fr>
 
 ENV SWIM_HOME /SWIM
