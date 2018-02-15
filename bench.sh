@@ -81,12 +81,14 @@ while [[ -z $command ]]; do
             shift
             ;;
         mapreduce)
+            shift
             command="start_mapreduce_examples $@"
             ;;
         pi)
             command="start_mapreduce_examples pi 20 1000"
             ;;
         hibench)
+            shift
             command="start_hibench $@"
             ;;
         swim)
@@ -98,7 +100,5 @@ while [[ -z $command ]]; do
             ;;
     esac
 done
-
-shift
 
 $command "$@" | sed -r "s/\x1b[\[|\(][0-9;]*[a-zA-Z]//g"
