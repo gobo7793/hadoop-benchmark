@@ -101,4 +101,4 @@ while [[ -z $command ]]; do
     esac
 done
 
-$command "$@" | sed -r "s/\x1b[\[|\(][0-9;]*[a-zA-Z]//g"
+$command | sed -r "s/\x1b[\[|\(][0-9;]*[a-zA-Z]//g"
