@@ -58,8 +58,8 @@ stop_cluster(){
 destroy_cluster(){
     log "Destroying cluster"
     
-    do_clustersh "destroy-cluster"
-    vboxmanage hostonlyif remove vboxnet0
+    do_clustersh "destroy-cluster" \
+        && vboxmanage hostonlyif remove vboxnet0
 }
 
 start_hadoop(){
@@ -77,8 +77,8 @@ stop_hadoop(){
 destroy_hadoop(){
     log "Destroying hadoop and removing hadoop docker images"
     
-    do_clustersh "destroy-hadoop"
-    docker rmi hadoop-benchmark/self-balancing-example
+    do_clustersh "destroy-hadoop" \
+        && docker rmi hadoop-benchmark/self-balancing-example
 }
 
 ls_hadoop(){
@@ -158,15 +158,13 @@ connection_info(){
 start(){
     log "starting cluster+hadoop"
     
-    start_cluster
-    start_hadoop
+    start_cluster && start_hadoop
 }
 
 stop(){
     log "stopping hadoop+cluster"
     
-    stop_hadoop
-    stop_cluster
+    stop_hadoop && stop_cluster
 }
 
 cluster_control(){
@@ -258,7 +256,7 @@ networking_control(){
 }
 
 print_help(){
-cat <<EOM
+cat << EOM
 Usage: $0 [OPTIONS] COMMAND
 
 Options:
