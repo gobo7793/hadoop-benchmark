@@ -101,7 +101,7 @@ stop_hadoop(){
 restart_hadoop(){
     log "Restarting hadoop"
     
-    do_clustersh "restart-hadoop"
+    stop_hadoop && start_hadoop
 }
 
 destroy_hadoop(){
