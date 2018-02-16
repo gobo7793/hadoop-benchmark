@@ -55,36 +55,17 @@ stop_cluster(){
     do_clustersh "stop-cluster"
 }
 
+restart_cluster(){
+    log "Restarting cluster"
+    
+    do_clustersh "restart-cluster"
+}
+
 destroy_cluster(){
     log "Destroying cluster"
     
     do_clustersh "destroy-cluster" \
         && vboxmanage hostonlyif remove vboxnet0
-}
-
-start_hadoop(){
-    log "Starting hadoop"
-    
-    do_clustersh "start-hadoop"
-}
-
-stop_hadoop(){
-    log "Stopping hadoop"
-    
-    do_clustersh "stop-hadoop"
-}
-
-destroy_hadoop(){
-    log "Destroying hadoop and removing hadoop docker images"
-    
-    do_clustersh "destroy-hadoop" \
-        && docker rmi hadoop-benchmark/self-balancing-example
-}
-
-ls_hadoop(){
-    log "List running hadoop docker container"
-    
-    docker $(docker-machine config --swarm local-hadoop-controller) ps
 }
 
 start_machine(){
@@ -99,6 +80,37 @@ stop_machine(){
     docker-machine stop local-hadoop-compute-$1
 }
 
+restart_machine(){
+    log "Restarting docker-machine: local-hadoop-compute-$1"
+    
+    stop_machine $1 && start_machine $1
+}
+
+start_hadoop(){
+    log "Starting hadoop"
+    
+    do_clustersh "start-hadoop"
+}
+
+stop_hadoop(){
+    log "Stopping hadoop"
+    
+    do_clustersh "stop-hadoop"
+}
+
+restart_hadoop(){
+    log "Restarting hadoop"
+    
+    do_clustersh "restart-hadoop"
+}
+
+destroy_hadoop(){
+    log "Destroying hadoop and removing hadoop docker images"
+    
+    do_clustersh "destroy-hadoop" \
+        && docker $(docker-machine config --swarm local-hadoop-controller) rmi hadoop-benchmark/self-balancing-example
+}
+
 start_node(){
     log "Starting Node: compute-$1"
     
@@ -109,6 +121,18 @@ stop_node(){
     log "Stopping Node: compute-$1"
     
     docker $(docker-machine config local-hadoop-compute-"$1") stop compute-$1
+}
+
+restart_node(){
+    log "Restarting Node: compute-$1"
+    
+    stop_node $1 && start_node $1
+}
+
+ls_hadoop(){
+    log "List running hadoop docker container"
+    
+    docker $(docker-machine config --swarm local-hadoop-controller) ps
 }
 
 info_node(){
@@ -156,15 +180,21 @@ connection_info(){
 }
 
 start(){
-    log "starting cluster+hadoop"
+    log "Starting cluster+hadoop"
     
     start_cluster && start_hadoop
 }
 
 stop(){
-    log "stopping hadoop+cluster"
+    log "Stopping hadoop+cluster"
     
     stop_hadoop && stop_cluster
+}
+
+restart(){
+    log "Restarting hadoop+cluster"
+    
+    start && stop
 }
 
 cluster_control(){
@@ -186,6 +216,14 @@ cluster_control(){
                 stop_cluster
             else
                 stop_machine $machine
+            fi
+            ;;
+        restart)
+            if [[ -z "$machine" ]]
+            then
+                restart_cluster
+            else
+                restart_machine $machine
             fi
             ;;
         destroy)
@@ -217,6 +255,14 @@ hadoop_control(){
                 stop_hadoop
             else
                 stop_node $node
+            fi
+            ;;
+        restart)
+            if [[ -z "$node" ]]
+            then
+                restart_hadoop
+            else
+                restart_node $node
             fi
             ;;
         destroy)
@@ -268,14 +314,17 @@ Options:
 Commands:
     start                   starting cluster+hadoop
     stop                    stopping hadoop+cluster
+    restart                 restarts cluster+hadoop
     
     cluster start [node-id] starting cluster or the given machine
     cluster stop [node-id]  stopping hadoop or the given machine
+    cluster restart [node]  restarts hadoop or the given machine
     cluster destroy         destroys the cluster
     
     hadoop start [node-id]  starting hadoop or the given node
     hadoop stop [node-id]   stopping hadoop or the given node
-    hadoop destroy          destroys the cluster
+    hadoop restart [node]   restarts hadoop or the given node
+    hadoop destroy          destroys hadoop
     hadoop info [node-id]   list running containers or node container details
     
     net start <node-id>     enables networking interfaces on the given node
@@ -326,6 +375,10 @@ while [[ -z $command ]]; do
             ;;
         stop)
             command=stop
+            break
+            ;;
+        restart)
+            command=restart
             break
             ;;
         cluster)
