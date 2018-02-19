@@ -56,7 +56,7 @@ Options:
     -q, --quiet             Do not print which commands are executed
 
 Commands:
-    mapreduce [args]        runs mapreduce example programs or
+    examples [args]         runs mapreduce example programs or
                               no args to list all available examples
     pi                      runs pi calculation mapreduce example
     jobclient [args]        runs jobclient test programs or
@@ -88,7 +88,7 @@ while [[ -z $command ]]; do
             force="true"
             shift
             ;;
-        mapreduce)
+        example)
             shift
             command="start_mapreduce_examples $@"
             ;;
