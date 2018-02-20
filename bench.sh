@@ -36,7 +36,7 @@ start_mapreduce_examples(){
 }
 
 start_hibench(){
-    log "Starting Intel HiBench benchmarks: $@"
+    log "Starting Intel HiBench: $@"
     
     $DIR/benchmarks/hibench/run.sh "$@"
 }
@@ -61,8 +61,10 @@ Commands:
     pi                      runs pi calculation mapreduce example
     jobclient [args]        runs jobclient test programs or
                               no args to list all available tests
-    hibench [workloads]     runs Intel HiBench benchmarks with given workloads
-                              see github for list of all workloads
+    hibench [--benchmarks [args]]
+                            runs Intel HiBench cmd or given benchmarks
+                              see github for list of all benchmarks
+                              or nothing to start micro workload
     swim                    runs the SWIM jobs
 EOM
 }
