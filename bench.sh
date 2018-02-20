@@ -56,7 +56,7 @@ Options:
     -q, --quiet             Do not print which commands are executed
 
 Commands:
-    examples [args]         runs mapreduce example programs or
+    example [args]          runs mapreduce example programs or
                               no args to list all available examples
     pi                      runs pi calculation mapreduce example
     jobclient [args]        runs jobclient test programs or
