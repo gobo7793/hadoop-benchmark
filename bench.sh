@@ -8,6 +8,7 @@ cd "$DIR"
 
 declare -r script_name="$(basename $0)"
 debug="true"
+timestamp="false"
 
 log() {
   if [[ "$debug" == "true" ]]; then
@@ -23,28 +24,38 @@ error() {
   echo >&2 "[$script_name]: $@"
 }
 
-start_jobclient_tests(){
-    log "Starting benchmark jobclient test: $1"
-    
-    $DIR/benchmarks/hadoop-jobclient-tests/run.sh "$@"
+start_benchmark(){
+  bench=$1
+  shift
+  t=
+  if [[ $timestamp == "true" ]]; then
+    t="-t"
+  fi
+  $DIR/benchmarks/$bench/run.sh $t "$@"
 }
 
 start_mapreduce_examples(){
     log "Starting benchmark mapreduce example: $1"
     
-    $DIR/benchmarks/hadoop-mapreduce-examples/run.sh "$@"
+    start_benchmark hadoop-mapreduce-examples "$@"
+}
+
+start_jobclient_tests(){
+    log "Starting benchmark jobclient test: $1"
+    
+    start_benchmark hadoop-jobclient-tests "$@"
 }
 
 start_hibench(){
     log "Starting Intel HiBench: $@"
     
-    $DIR/benchmarks/hibench/run.sh "$@"
+    start_benchmark hibench "$@"
 }
 
 start_swim(){
     log "Starting SWIM jobs"
     
-    $DIR/benchmarks/swim/run.sh
+    start_benchmark swim
 }
 
 print_help(){
@@ -54,6 +65,7 @@ Usage: $0 [OPTIONS] COMMAND
 Options:
     -h, --help              Prints this help
     -q, --quiet             Do not print which commands are executed
+    -t, --timestamp         Using timestamps for docker container names
 
 Commands:
     example [args]          runs mapreduce example programs or
@@ -85,9 +97,9 @@ while [[ -z $command ]]; do
             debug="false"
             shift
             ;;
-        -f|--force)
-            log "Forcing docker commands if available"
-            force="true"
+        -t|--timestamp)
+            log "Using timestamp docker container names"
+            timestamp="true"
             shift
             ;;
         example)
