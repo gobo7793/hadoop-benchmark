@@ -17,11 +17,12 @@ else
 fi
 
 # run the benchmark at the controller node
-docker $controller_conn run \
-  -it \
+cmd="docker $controller_conn run \
+  -t \
   --rm \
   --net hadoop-net \
   --name hadoop-benchmark-hibench \
   -h hadoop-benchmark-hibench \
   hadoop-benchmark-hibench \
-  "$BENCHMARKS"
+  $BENCHMARKS"
+$cmd
