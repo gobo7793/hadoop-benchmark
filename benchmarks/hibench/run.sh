@@ -2,6 +2,13 @@
 set -e
 source $(dirname $0)/../common.sh
 
+if [[ $1 == "-t" ]]; then
+  name="hibench-$timestamp"
+  shift
+else
+  name="hadoop-benchmark-hibench"
+fi
+
 # benchmark settings
 ALL_BENCHMARKS="micro.wordcount micro.sort micro.terasort micro.sleep"
 
@@ -21,8 +28,8 @@ cmd="docker $controller_conn run \
   -t \
   --rm \
   --net hadoop-net \
-  --name hadoop-benchmark-hibench \
-  -h hadoop-benchmark-hibench \
+  --name $name \
+  -h $name \
   hadoop-benchmark-hibench \
   $BENCHMARKS"
 $cmd
