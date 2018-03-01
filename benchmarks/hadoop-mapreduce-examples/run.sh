@@ -18,4 +18,4 @@ cmd="docker $controller_conn run \
   hadoop-benchmark/self-balancing-mt \
   run \
   hadoop jar /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar $@"
-echo $cmd
+$cmd
