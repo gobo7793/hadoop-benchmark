@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+echo -n 'hibench.hdfs.data.dir ${hibench.hdfs.master}/' >> $HIBENCH_HOME/conf/hibench.conf
+if [[ $1 == "--dir" ]]; then
+  echo $2 >> $HIBENCH_HOME/conf/hibench.conf
+  shift 2
+else
+  echo "HiBench" >> $HIBENCH_HOME/conf/hibench.conf
+fi
+
 case "$1" in
   --benchmarks)
     shift
@@ -27,3 +35,4 @@ cat "$report"
 echo
 echo "The report has been uploaded to HDFS: $dest"
 echo "To download, run ./cluster.sh hdfs-download \"$dest\""
+
