@@ -194,7 +194,7 @@ stop(){
 restart(){
     log "Restarting hadoop+cluster"
     
-    start && stop
+    stop && start
 }
 
 cluster_control(){
