@@ -152,7 +152,12 @@ ls_hadoop(){
 info_node(){
     log "Inspecting Node: compute-$1"
     
-    docker $(docker-machine config local-hadoop-compute-"$1") inspect compute-$1
+    if [[ -n $2 ]]; then
+        format="-f $2"
+    fi
+    
+    cmd="docker $(docker-machine config local-hadoop-compute-$1) inspect $format compute-$1"
+    $cmd
 }
 
 start_net(){
@@ -254,6 +259,7 @@ cluster_control(){
 hadoop_control(){
     cmd=$1
     node=$2
+    format="$3"
     
     case "$cmd" in
         start)
@@ -288,7 +294,7 @@ hadoop_control(){
             then
                 ls_hadoop
             else
-                info_node $node
+                info_node $node "$format"
             fi
             ;;
         *)
@@ -340,7 +346,8 @@ Commands:
     hadoop stop [node-id]   stopping hadoop or the given node
     hadoop restart [node]   restarts hadoop or the given node
     hadoop destroy          destroys hadoop
-    hadoop info [node-id]   list running containers or node container details
+    hadoop info [id] [form] list running containers or node container details
+                              and can use --format string
     
     net start <node-id>     enables networking interfaces on the given node
     net stop <node-id>      disables networking interfaces on the given node
