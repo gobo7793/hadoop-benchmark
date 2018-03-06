@@ -87,12 +87,10 @@ run_docker() {
 wait_for_port() {
   ip=$1
   port=$2
-  
-  sleep 15
 
   while ! nc -z $ip $port > /dev/null; do
     log "Waiting for $ip:$port ..."
-    sleep 1
+    sleep 5
   done
 }
 
@@ -495,7 +493,9 @@ start_hadoop() {
   wait_for_port $(docker-machine ip $controller_node_name) 8088
   # run_docker $controller_node_name exec controller \
   #   bash -c "while ! nc -z localhost 8088; do echo -n '.'; sleep 1; done; echo"
-
+  
+  controllerip=$(docker $(docker-machine config $controller_node_name) inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' controller)
+  
   # start computes
   for i in $(seq 1 $NUM_COMPUTE_NODES); do
     local name="compute-$i"
@@ -503,6 +503,7 @@ start_hadoop() {
     start_container $machine $name \
       -h $name \
       --net $network_name \
+      --add-host="controller:$controllerip" \
       -p "8042:8042" \
       -p "50075:50075" \
       -e "CONF_CONTROLLER_HOSTNAME=controller" \
