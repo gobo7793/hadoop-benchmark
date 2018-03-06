@@ -47,6 +47,20 @@ start_cluster(){
     log "Starting cluster"
     
     do_clustersh "start-cluster"
+    
+    log "Adding port forwarding for RM, TLS, HDFS and graphite (port 8080)"
+    if [[ -z $(VBoxManage showvminfo local-hadoop-controller | grep "name = RM, protocol = tcp") ]]; then
+        VBoxManage controlvm local-hadoop-controller natpf1 RM,tcp,,8088,,8088
+    fi
+    if [[ -z $(VBoxManage showvminfo local-hadoop-controller | grep "name = TLS, protocol = tcp") ]]; then
+        VBoxManage controlvm local-hadoop-controller natpf1 TLS,tcp,,8188,,8188
+    fi
+    if [[ -z $(VBoxManage showvminfo local-hadoop-controller | grep "name = HDFS, protocol = tcp") ]]; then
+        VBoxManage controlvm local-hadoop-controller natpf1 HDFS,tcp,,50700,,50700
+    fi
+    if [[ -z $(VBoxManage showvminfo local-hadoop-controller | grep "name = graphite, protocol = tcp") ]]; then
+        VBoxManage controlvm local-hadoop-controller natpf1 graphite,tcp,,8080,,80
+    fi
 }
 
 stop_cluster(){
@@ -188,7 +202,8 @@ start(){
 stop(){
     log "Stopping hadoop+cluster"
     
-    stop_hadoop && stop_cluster
+    stop_hadoop
+    stop_cluster
 }
 
 restart(){
