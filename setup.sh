@@ -9,6 +9,7 @@ CLUSTERSH="$DIR/cluster.sh"
 
 cd "$DIR"
 
+[[ -f $CONFIG ]] && source $CONFIG
 declare -r script_name="$(basename $0)"
 force="false"
 debug="true"
@@ -49,17 +50,17 @@ start_cluster(){
     do_clustersh "start-cluster"
     
     log "Adding port forwarding for RM, TLS, HDFS and graphite (port 8080)"
-    if [[ -z $(VBoxManage showvminfo local-hadoop-controller | grep "name = RM, protocol = tcp") ]]; then
-        VBoxManage controlvm local-hadoop-controller natpf1 RM,tcp,,8088,,8088
+    if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-controller | grep "name = RM, protocol = tcp") ]]; then
+        VBoxManage controlvm $CLUSTER_NAME_PREFIX-controller natpf1 RM,tcp,,8088,,8088
     fi
-    if [[ -z $(VBoxManage showvminfo local-hadoop-controller | grep "name = TLS, protocol = tcp") ]]; then
-        VBoxManage controlvm local-hadoop-controller natpf1 TLS,tcp,,8188,,8188
+    if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-controller | grep "name = TLS, protocol = tcp") ]]; then
+        VBoxManage controlvm $CLUSTER_NAME_PREFIX-controller natpf1 TLS,tcp,,8188,,8188
     fi
-    if [[ -z $(VBoxManage showvminfo local-hadoop-controller | grep "name = HDFS, protocol = tcp") ]]; then
-        VBoxManage controlvm local-hadoop-controller natpf1 HDFS,tcp,,50700,,50700
+    if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-controller | grep "name = HDFS, protocol = tcp") ]]; then
+        VBoxManage controlvm $CLUSTER_NAME_PREFIX-controller natpf1 HDFS,tcp,,50700,,50700
     fi
-    if [[ -z $(VBoxManage showvminfo local-hadoop-controller | grep "name = graphite, protocol = tcp") ]]; then
-        VBoxManage controlvm local-hadoop-controller natpf1 graphite,tcp,,8080,,80
+    if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-controller | grep "name = graphite, protocol = tcp") ]]; then
+        VBoxManage controlvm $CLUSTER_NAME_PREFIX-controller natpf1 graphite,tcp,,8080,,80
     fi
 }
 
@@ -83,19 +84,19 @@ destroy_cluster(){
 }
 
 start_machine(){
-    log "Starting docker-machine: local-hadoop-compute-$1"
+    log "Starting docker-machine: $CLUSTER_NAME_PREFIX-compute-$1"
     
-    docker-machine start local-hadoop-compute-$1
+    docker-machine start $CLUSTER_NAME_PREFIX-compute-$1
 }
 
 stop_machine(){
-    log "Stopping docker-machine: local-hadoop-compute-$1"
+    log "Stopping docker-machine: $CLUSTER_NAME_PREFIX-compute-$1"
     
-    docker-machine stop local-hadoop-compute-$1
+    docker-machine stop $CLUSTER_NAME_PREFIX-compute-$1
 }
 
 restart_machine(){
-    log "Restarting docker-machine: local-hadoop-compute-$1"
+    log "Restarting docker-machine: $CLUSTER_NAME_PREFIX-compute-$1"
     
     stop_machine $1 && start_machine $1
 }
@@ -122,19 +123,19 @@ destroy_hadoop(){
     log "Destroying hadoop and removing hadoop docker images"
     
     do_clustersh "destroy-hadoop" \
-        && docker $(docker-machine config --swarm local-hadoop-controller) rmi hadoop-benchmark/self-balancing-example
+        && docker $(docker-machine config --swarm $CLUSTER_NAME_PREFIX-controller) rmi hadoop-benchmark/self-balancing-example
 }
 
 start_node(){
     log "Starting Node: compute-$1"
     
-    docker $(docker-machine config local-hadoop-compute-"$1") start compute-$1
+    docker $(docker-machine config $CLUSTER_NAME_PREFIX-compute-"$1") start compute-$1
 }
 
 stop_node(){
     log "Stopping Node: compute-$1"
     
-    docker $(docker-machine config local-hadoop-compute-"$1") stop compute-$1
+    docker $(docker-machine config $CLUSTER_NAME_PREFIX-compute-"$1") stop compute-$1
 }
 
 restart_node(){
@@ -146,7 +147,7 @@ restart_node(){
 ls_hadoop(){
     log "List running hadoop docker container"
     
-    docker $(docker-machine config --swarm local-hadoop-controller) ps
+    docker $(docker-machine config --swarm $CLUSTER_NAME_PREFIX-controller) ps
 }
 
 info_node(){
@@ -156,26 +157,26 @@ info_node(){
         format="-f $2"
     fi
     
-    cmd="docker $(docker-machine config local-hadoop-compute-$1) inspect $format compute-$1"
+    cmd="docker $(docker-machine config $CLUSTER_NAME_PREFIX-compute-$1) inspect $format compute-$1"
     $cmd
 }
 
 start_net(){
     log "Enable network adapter of node: compute-$1"
     
-    docker $(docker-machine config local-hadoop-compute-"$1") network connect hadoop-net compute-$1
+    docker $(docker-machine config $CLUSTER_NAME_PREFIX-compute-"$1") network connect hadoop-net compute-$1
 }
 
 stop_net(){
     log "Disable network adapter of node: compute-$1"
     
-    docker $(docker-machine config local-hadoop-compute-"$1") network disconnect hadoop-net compute-$1
+    docker $(docker-machine config $CLUSTER_NAME_PREFIX-compute-"$1") network disconnect hadoop-net compute-$1
 }
 
 hadoop_cmd(){
     log "Using hadoop console command: $@"
     
-    docker $(docker-machine config local-hadoop-controller) exec controller "$@"
+    docker $(docker-machine config $CLUSTER_NAME_PREFIX-controller) exec controller "$@"
 }
 
 console(){
