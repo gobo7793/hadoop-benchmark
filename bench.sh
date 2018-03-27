@@ -3,6 +3,8 @@
 DIR=~/hadoop-benchmark
 TERM=xterm
 export TERM
+CONFIG=masterthesis
+export CONFIG
 
 cd "$DIR"
 
