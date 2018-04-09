@@ -44,27 +44,32 @@ do_clustersh(){
     $do
 }
 
+create_portforwarding(){
+    machine=$1
+    app=$2
+    guestPort=$3
+    if [[ -z $4 ]]; then
+        hostPort=$3
+    else
+        hostPort=$4
+    fi
+
+    if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-$machine | grep "name = $app, protocol = tcp") ]]; then
+        VBoxManage controlvm $CLUSTER_NAME_PREFIX-$machine natpf1 $app,tcp,,$hostPort,,$guestPort
+    fi
+}
+
 start_cluster(){
     log "Starting cluster"
     
     do_clustersh "start-cluster"
     
-    log "Adding port forwarding for consul, RM, TLS, HDFS and graphite (port 8080)"
-    if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-consul | grep "name = consul, protocol = tcp") ]]; then
-        VBoxManage controlvm $CLUSTER_NAME_PREFIX-consul natpf1 consul,tcp,,8500,,8500
-    fi
-    if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-controller | grep "name = RM, protocol = tcp") ]]; then
-        VBoxManage controlvm $CLUSTER_NAME_PREFIX-controller natpf1 RM,tcp,,8088,,8088
-    fi
-    if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-controller | grep "name = TLS, protocol = tcp") ]]; then
-        VBoxManage controlvm $CLUSTER_NAME_PREFIX-controller natpf1 TLS,tcp,,8188,,8188
-    fi
-    if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-controller | grep "name = HDFS, protocol = tcp") ]]; then
-        VBoxManage controlvm $CLUSTER_NAME_PREFIX-controller natpf1 HDFS,tcp,,50700,,50700
-    fi
-    if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-controller | grep "name = graphite, protocol = tcp") ]]; then
-        VBoxManage controlvm $CLUSTER_NAME_PREFIX-controller natpf1 graphite,tcp,,8080,,80
-    fi
+    log "Adding port forwarding for consul (8500), RM (8088), TLS (8188), HDFS (50700), graphite (8080)"
+    create_portforwarding consul consul 8500
+    create_portforwarding controller RM 8088
+    create_portforwarding controller TLS 8188
+    create_portforwarding controller HDFS 50700
+    create_portforwarding controller graphite 80 8080
 }
 
 stop_cluster(){
