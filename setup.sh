@@ -49,7 +49,10 @@ start_cluster(){
     
     do_clustersh "start-cluster"
     
-    log "Adding port forwarding for RM, TLS, HDFS and graphite (port 8080)"
+    log "Adding port forwarding for consul, RM, TLS, HDFS and graphite (port 8080)"
+    if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-consul | grep "name = consul, protocol = tcp") ]]; then
+        VBoxManage controlvm $CLUSTER_NAME_PREFIX-consul natpf1 consul,tcp,,8500,,8500
+    fi
     if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-controller | grep "name = RM, protocol = tcp") ]]; then
         VBoxManage controlvm $CLUSTER_NAME_PREFIX-controller natpf1 RM,tcp,,8088,,8088
     fi
