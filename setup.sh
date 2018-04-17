@@ -53,9 +53,14 @@ create_portforwarding(){
     else
         hostPort=$4
     fi
+    if [[ -z $5 ]]; then
+        protocol="tcp"
+    else
+        protocol=$5
+    fi
 
-    if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-$machine | grep "name = $app, protocol = tcp") ]]; then
-        VBoxManage controlvm $CLUSTER_NAME_PREFIX-$machine natpf1 $app,tcp,,$hostPort,,$guestPort
+    if [[ -z $(VBoxManage showvminfo $CLUSTER_NAME_PREFIX-$machine | grep "name = $app, protocol = $protocol") ]]; then
+        VBoxManage controlvm $CLUSTER_NAME_PREFIX-$machine natpf1 $app,$protocoll,,$hostPort,,$guestPort
     fi
 }
 
@@ -64,8 +69,15 @@ start_cluster(){
     
     do_clustersh "start-cluster"
     
-    log "Adding port forwarding for consul (8500), RM (8088), TLS (8188), HDFS (50700), graphite (8080)"
+    log "Adding port forwarding for consul (2376,3376,8500,7946,4789)"
+    create_portforwarding consul docker 2376
+    create_portforwarding consul swarm 3376
     create_portforwarding consul consul 8500
+    create_portforwarding consul ovnet 7946
+    create_portforwarding consul ovnetudp 7946 7946 udp
+    create_portforwarding consul ovnet2 4789
+    
+    log "Adding port forwarding for RM (8088), TLS (8188), HDFS (50700), graphite (80->8080)"
     create_portforwarding controller RM 8088
     create_portforwarding controller TLS 8188
     create_portforwarding controller HDFS 50700
