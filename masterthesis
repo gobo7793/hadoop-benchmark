@@ -3,6 +3,9 @@
 # the name of the cluster
 CLUSTER_NAME_PREFIX='hadoop'
 
+# the name of the multihost cluster
+CONTAINER_NAME_PREFIX='hadoop'
+
 # the driver to be used to create the cluster
 # for list of available drivers go to https://docs.docker.com/machine/drivers/
 DRIVER='virtualbox'

@@ -10,7 +10,6 @@ CLUSTERSH="$DIR/cluster.sh"
 cd "$DIR"
 
 [[ -f $CONFIG ]] && source $CONFIG
-declare -r script_name="$(basename $0)"
 force="false"
 debug="true"
 
@@ -353,16 +352,18 @@ Options:
     -h, --help              Prints this help
     -q, --quiet             Do not print which commands are executed
 
-Commands:
+General Cluster+Hadoop commands:
     start                   starting cluster+hadoop
     stop                    stopping hadoop+cluster
     restart                 restarts cluster+hadoop
     
+Cluster commands:
     cluster start [node-id] starting cluster or the given machine
     cluster stop [node-id]  stopping hadoop or the given machine
     cluster restart [node]  restarts hadoop or the given machine
     cluster destroy         destroys the cluster
     
+Hadoop container commands:
     hadoop start [node-id]  starting hadoop or the given node
     hadoop stop [node-id]   stopping hadoop or the given node
     hadoop restart [node]   restarts hadoop or the given node
@@ -370,9 +371,11 @@ Commands:
     hadoop info [id] [form] list running containers or node container details
                               and can use --format string
     
+Hadoop container network commands:
     net start <node-id>     enables networking interfaces on the given node
     net stop <node-id>      disables networking interfaces on the given node
-    
+  
+Misc commands:
     cmd <cmd>               executes the given command on hadoop controller
     
     console                 starts a console container connected to the cluster
