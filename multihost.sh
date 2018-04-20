@@ -95,7 +95,7 @@ hadoop_cmd(){
 }
 
 get_controller_ip(){
-    docker inspect \
+    return docker inspect \
         -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' \
         $controller_container_name
 }
@@ -172,12 +172,64 @@ stop_compute(){
     stop_container "$compute_container_name-$1"
 }
 
+start_host(){
+    hostid=$1
+    computeid=1
+    computesPerHost=$(($NUM_COMPUTE_NODES/2))
+    
+    log "Start host $1"
+    
+    # start host 1 with controller
+    if [[ $hostid -eq 1 ]]; then
+        start_graphite
+        start_controller
+        controllerip=get_controller_ip
+        for i in $(seq 1 $computesPerHost); do
+            start_compute $computeid $controllerip
+            ((++computeid))
+        done
+    fi
+    
+    # start other hosts
+    computeid=$(($computesPerHost*$hostid+1))
+    for i in $(seq 1 $computesPerHost); do
+        start_compute $computeid $controllerip
+        ((++computeid))
+    done
+}
+
+stop_host(){
+    hostid=$1
+    computeid=1
+    computesPerHost=$(($NUM_COMPUTE_NODES/2))
+    
+    # stop other hosts
+    computeid=$(($computesPerHost*$hostid+1))
+    for i in $(seq 1 $computesPerHost); do
+        start_compute $computeid $controllerip
+        ((++computeid))
+    done
+    
+    # stop host 1 with controller
+    if [[ $hostid -eq 1 ]]; then
+        for i in $(seq 1 $computesPerHost); do
+            start_compute $computeid $controllerip
+            ((++computeid))
+        done
+        stop_controller
+        stop_graphite
+    fi
+}
+
 start(){
     type=$1
-    computeid=$2
+    id=$2
     controllerip=$3
     
     case "$type" in
+        host)
+            start_host $id
+            ;;
         graphite)
             start_graphite
             ;;
@@ -185,7 +237,7 @@ start(){
             start_controller
             ;;
         compute)
-            start_compute $computeid $controllerip
+            start_compute $id $controllerip
             ;;
         *)
             unknown_command "start $type"
@@ -195,9 +247,12 @@ start(){
 
 stop(){
     type=$1
-    computeid=$2
+    id=$2
     
     case "$type" in
+        host)
+            stop_host $id
+            ;;
         graphite)
             stop_graphite
             ;;
@@ -205,7 +260,7 @@ stop(){
             stop_controller
             ;;
         compute)
-            stop_compute $computeid
+            stop_compute $id
             ;;
         *)
             unknown_command "stop $type"
@@ -247,15 +302,19 @@ Options:
     -q, --quiet             Do not print which commands are executed
 
 Start container commands:
-    start graphite          Starting graphite container
-    start controller        Starting controller container
+    start host <number>     Starts all container on host <number>.
+
+    start graphite          Starts graphite container
+    start controller        Starts controller container
     start compute <id> <controllerip>
-                            Starting given compute container
+                            Starts given compute container
 
 Stopping container commands:
-    stop graphite           Stopping graphite container
-    stop controller         Stopping controller container
-    stop compute <id>       Stopping given compute container
+    stop host <number>      Stops all container on host <number>.
+
+    stop graphite           Stops graphite container
+    stop controller         Stops controller container
+    stop compute <id>       Stops given compute container
 
 Hadoop container network commands:
     net start <node-id>     Enables networking interfaces on the given node
@@ -269,9 +328,9 @@ Misc commands:
     controllerip            Gets the controller ip based on hadoop network
 
 Notes:
-    Only for the local docker container on this host of the multihost cluster.
-    Starts NUM_COMPUTE_NODES compute nodes on controller host and the half count
-    on worker host, so 1.5*NUM_COMPUTE_NODES compute nodes will be created.
+    Only for the local docker container on localhost of the multihost cluster.
+    Starts NUM_COMPUTE_NODES compute nodes on host 1 and the half count on other
+    hosts >1, so (1+hosts/2)*NUM_COMPUTE_NODES compute nodes will be created.
 
 EOM
 }
