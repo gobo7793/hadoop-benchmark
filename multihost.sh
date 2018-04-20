@@ -49,10 +49,10 @@ run_container(){
     #from https://stackoverflow.com/a/38576401
     if [[ ! "$(docker ps -q -f name=$name)" ]]; then
         if [[ "$(docker ps -aq -f status=exited -f name=$name)" ]]; then
-            log "Container $name exists, removing..."
+            log "Container $name exists, removing"
             docker rm $name
         fi
-        log "Running container $name..."
+        log "Run container: $name"
         docker run --name $name $options
     fi
 }
@@ -60,8 +60,38 @@ run_container(){
 stop_container(){
     name=$1
     
-    log "Stopping container $name..."
+    log "Stop container $name"
     docker stop $name
+}
+
+create_net(){    
+    log "Creating docker overlay network: $network_name"    
+    docker network create -d overlay --attachable $network_name
+}
+
+destroy_net(){    
+    log "Destroy docker overlay network: $network_name"    
+    docker network rm -d overlay --attachable $network_name
+}
+
+start_net(){
+    node="$compute_container_name-$1"
+    
+    log "Enable network adapter on node: $node"    
+    docker network connect $network_name "$node"
+}
+
+stop_net(){
+    node="$compute_container_name-$1"
+    
+    log "Disable network adapter on node: $node"    
+    docker network disconnect $network_name "$node"
+}
+
+hadoop_cmd(){
+    log "Using hadoop console command: $@"
+    
+    docker exec $controller_container_name "$@"
 }
 
 get_controller_ip(){
@@ -183,6 +213,29 @@ stop(){
     esac
 }
 
+net(){
+    cmd=$1
+    node=$2
+    
+    case "$cmd" in
+        start)
+            start_net $node
+            ;;
+        stop)
+            stop_net $node
+            ;;
+        create)
+            create_net $node
+            ;;
+        destroy)
+            destroy_net $node
+            ;;
+        *)
+            unknown_command "net $cmd"
+            ;;
+    esac
+}
+
 print_help(){
 cat << EOM
 Usage: $0 [OPTIONS] COMMAND
@@ -204,8 +257,16 @@ Stopping container commands:
     stop controller         Stopping controller container
     stop compute <id>       Stopping given compute container
 
+Hadoop container network commands:
+    net start <node-id>     Enables networking interfaces on the given node
+    net stop <node-id>      Disables networking interfaces on the given node
+    
+    net create              Creates the docker overlay network
+    net destroy             Destroys the docker overlay network
+
 Misc commands:
-    controllerip            Returns the controller ip
+    cmd <cmd>               Executes the given command on hadoop controller
+    controllerip            Gets the controller ip based on hadoop network
 
 Notes:
     Only for the local docker container on this host of the multihost cluster.
@@ -250,6 +311,14 @@ while [[ -z $command ]]; do
             ;;
         stop)
             command=stop
+            break
+            ;;
+        net)
+            command=net
+            break
+            ;;
+        cmd)
+            command=hadoop_cmd
             break
             ;;
         controllerip)
