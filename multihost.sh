@@ -174,6 +174,7 @@ stop_compute(){
 
 start_host(){
     hostid=$1
+    controllerip=$2
     computeid=1
     computesPerHost=$(($NUM_COMPUTE_NODES/2))
     
@@ -228,7 +229,7 @@ start(){
     
     case "$type" in
         host)
-            start_host $id
+            start_host $id $controllerip
             ;;
         graphite)
             start_graphite
@@ -302,7 +303,9 @@ Options:
     -q, --quiet             Do not print which commands are executed
 
 Start container commands:
-    start host <number>     Starts all container on host <number>.
+    start host <number> [controllerip]
+                            Starts all container on host <number>.
+                            Controller ip needed for other hosts than 1.
 
     start graphite          Starts graphite container
     start controller        Starts controller container
