@@ -47,7 +47,9 @@ run_container(){
     options="$@"
     
     #from https://stackoverflow.com/a/38576401
-    if [[ ! "$(docker ps -q -f name=$name)" ]]; then
+    if [[ "$(docker ps -q -f name=$name)" ]]; then
+        log "Container $name already running"
+    else
         if [[ "$(docker ps -aq -f status=exited -f name=$name)" ]]; then
             log "Container $name exists, removing"
             docker rm $name
@@ -95,7 +97,7 @@ hadoop_cmd(){
 }
 
 get_controller_ip(){
-    return docker inspect \
+    docker inspect \
         -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' \
         $controller_container_name
 }
