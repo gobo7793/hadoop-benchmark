@@ -217,6 +217,7 @@ stop_host(){
     
     # stop host 1 with controller
     if [[ $hostid -eq 1 ]]; then
+        computeid=1
         for i in $(seq 1 $computesPerHost); do
             stop_compute $computeid $controllerip
             ((++computeid))
