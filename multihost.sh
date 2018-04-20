@@ -186,7 +186,7 @@ start_host(){
     if [[ $hostid -eq 1 ]]; then
         start_graphite
         start_controller
-        controllerip=get_controller_ip
+        controllerip=$(get_controller_ip)
         for i in $(seq 1 $computesPerHost); do
             start_compute $computeid $controllerip
             ((++computeid))
