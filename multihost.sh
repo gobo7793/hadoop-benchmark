@@ -145,6 +145,8 @@ start_controller(){
         -d \
         $HADOOP_IMAGE \
         controller
+        
+    log "Controller IP: $(get_controller_ip)"
 }
 
 stop_controller(){
