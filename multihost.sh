@@ -123,8 +123,8 @@ start_compute(){
     name="compute-$1"
     controllerip=$2
     
-    http_port=8041+$1
-    hdfs_port=50074+$1
+    http_port=$((8041+$1))
+    hdfs_port=$((50074+$1))
     
     run_container "$compute_container_name-$1" \
         -h $name \
