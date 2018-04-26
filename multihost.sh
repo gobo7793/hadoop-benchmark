@@ -41,16 +41,39 @@ unknown_command(){
     print_help
 }
 
-run_container(){
+check_docker_container() {
+  name=$1
+
+  docker inspect -f '{{.State.Status}}' $name 2> /dev/null || echo 'nonexistent'
+}
+
+build_container(){
     name=$1
     shift
     options="$@"
     
-    #from https://stackoverflow.com/a/38576401
-    if [[ "$(docker ps -q -f name=$name)" ]]; then
+    log "Checking status of docker image: $name:latest"
+    if [[ ! docker inspect $name:latest > /dev/null 2>&1 ]]; then
+        log "Docker image $name:latest does not exist, creating..."
+        docker build -t $name $options
+    else
+        log "Docker image $name:latest exists"
+    fi
+}
+
+run_container(){
+    name=$1
+    shift
+    options="$@"
+
+    log "Checking status of docker container: $name"
+    status=$(check_docker_container $name)
+    
+    # from https://stackoverflow.com/a/38576401 and modyfied
+    if [[ $status -eq "running" ]]; then
         log "Container $name already running"
     else
-        if [[ "$(docker ps -aq -f status=exited -f name=$name)" ]]; then
+        if [[ $status -eq "exited" ]]; then
             log "Container $name exists, removing"
             docker rm $name
         fi
@@ -131,6 +154,10 @@ start_graphite(){
 
 stop_graphite(){
     stop_container $graphite_container_name
+}
+
+build_hadoop(){
+    build_container $HADOOP_IMAGE $HADOOP_IMAGE_DIR
 }
 
 start_controller(){
@@ -251,6 +278,19 @@ start(){
     esac
 }
 
+build(){
+    type=$1
+    
+    case "$type" in
+        hadoop)
+            build_controller
+            ;;
+        *)
+            unknown_command "build $type"
+            ;;
+    esac
+}
+
 stop(){
     type=$1
     id=$2
@@ -307,10 +347,14 @@ Options:
     -h, --help              Prints this help
     -q, --quiet             Do not print which commands are executed
 
+Build image commands:
+    build hadoop            Builds hadoop container image
+
 Start container commands:
     start host <number> [controllerip]
                             Starts all container on host <number>.
                             Controller ip needed for other hosts than 1.
+                            Containers doesn't exists will be builded.
 
     start graphite          Starts graphite container
     start controller        Starts controller container
@@ -371,6 +415,10 @@ while [[ -z $command ]]; do
                 log "Config file $2 not found"
             fi
             shift 2
+            ;;
+        build)
+            command=build
+            break
             ;;
         start)
             command=start
