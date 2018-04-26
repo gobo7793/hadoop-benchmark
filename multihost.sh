@@ -53,7 +53,7 @@ build_container(){
     options="$@"
     
     log "Checking status of docker image: $name:latest"
-    if [[ ! docker inspect $name:latest > /dev/null 2>&1 ]]; then
+    if ! docker inspect $name:latest > /dev/null 2>&1; then
         log "Docker image $name:latest does not exist, creating..."
         docker build -t $name $options
     else
