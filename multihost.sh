@@ -14,10 +14,10 @@ cd "$DIR"
 declare -r docker_name_prefix="$CONTAINER_NAME_PREFIX"
 declare -r network_name='hadoop-net'
 declare -r script_name="$(basename $0)"
-declare -r consul_container_name="$docker_name_prefix-consul"
-declare -r graphite_container_name="$docker_name_prefix-graphite"
-declare -r controller_container_name="$docker_name_prefix-controller"
-declare -r compute_container_name="$docker_name_prefix-compute"
+declare -r consul_container_name="$docker_name_prefix""consul"
+declare -r graphite_container_name="$docker_name_prefix""graphite"
+declare -r controller_container_name="$docker_name_prefix""controller"
+declare -r compute_container_name="$docker_name_prefix""compute"
 
 force="false"
 debug="true"
@@ -173,8 +173,6 @@ start_controller(){
         -d \
         $HADOOP_IMAGE \
         controller
-        
-    log "Controller IP: $(get_controller_ip)"
 }
 
 stop_controller(){
@@ -231,6 +229,10 @@ start_host(){
         start_compute $computeid $controllerip
         ((++computeid))
     done
+
+    if [[ $hostid -eq 1 ]]; then
+        log "Controller IP: $(get_controller_ip)"
+    fi
 }
 
 stop_host(){
@@ -271,6 +273,7 @@ start(){
             ;;
         controller)
             start_controller
+            log "Controller IP: $(get_controller_ip)"
             ;;
         compute)
             start_compute $id $controllerip
