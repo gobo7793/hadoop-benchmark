@@ -71,10 +71,10 @@ run_container(){
     log "Status of container $name: $status"
     
     # from https://stackoverflow.com/a/38576401 and modyfied
-    if [[ $status -eq "running" ]]; then
+    if [[ $status == "running" ]]; then
         log "Container $name already running"
     else
-        if [[ $status -eq "exited" ]]; then
+        if [[ $status == "exited" ]]; then
             log "Container $name exists, removing"
             docker rm $name
         fi
