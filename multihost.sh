@@ -68,7 +68,7 @@ run_container(){
 
     log "Checking status of docker container: $name"
     status=$(check_docker_container $name)
-    log "Status of container $name: $status"
+    #log "Status of container $name: $status"
     
     # from https://stackoverflow.com/a/38576401 and modyfied
     if [[ $status == "running" ]]; then
