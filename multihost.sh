@@ -211,6 +211,8 @@ start_host(){
     
     log "Start host $1"
     
+    build_hadoop
+    
     # start host 1 with controller
     if [[ $hostid -eq 1 ]]; then
         start_graphite
