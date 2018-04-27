@@ -120,6 +120,13 @@ hadoop_cmd(){
     docker exec $controller_container_name "$@"
 }
 
+hdfs_cmd(){
+    log "Using hdfs command: $@"
+    
+    docker exec $controller_container_name hdfs "$@"
+    echo $?
+}
+
 get_controller_ip(){
     docker inspect \
         -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' \
@@ -383,6 +390,7 @@ Hadoop container network commands:
 
 Misc commands:
     cmd <cmd>               Executes the given command on hadoop controller
+    hdfs <cmd>              Executes the hdfs command and prints the exit code
     controllerip            Gets the controller ip based on hadoop network
 
 Notes:
@@ -440,6 +448,10 @@ while [[ -z $command ]]; do
             ;;
         cmd)
             command=hadoop_cmd
+            break
+            ;;
+        hdfs)
+            command=hdfs_cmd
             break
             ;;
         controllerip)
