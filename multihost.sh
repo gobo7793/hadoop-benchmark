@@ -121,8 +121,6 @@ hadoop_cmd(){
 }
 
 hdfs_cmd(){
-    log "Using hdfs command: $@"
-    
     docker exec $controller_container_name hdfs "$@"
     echo $?
 }
