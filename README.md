@@ -75,10 +75,10 @@ For an easy use on the masterthesis following changes was made:
 
 - own config `masterthesis` with scenario `selfbalancing-mt` (based on selfbalancing)
 
-- added jobclient tests
+- added jobclient tests and updated hibench benchmarks
 
-- `setup.sh`: easier use to create and control the cluster, based on `cluster.sh`
+- `setup.sh`: compact script to create and control the cluster for working on the masterthesis, based on `cluster.sh`
 
-- `bench.sh`: easier central control to start benchmarks
+- `bench.sh`: compact central control to start benchmarks for working on the masterthesis
 
-- `multihost.sh`: startup script to start the cluster w/o docker-machine directly on the host and with docker swarm for an easy made multihost hadoop cluster
+- `multihost.sh`: startup script to start/control the cluster w/o docker-machine directly on the host and with docker swarm for an easy made multihost hadoop cluster
