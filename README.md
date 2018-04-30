@@ -69,3 +69,16 @@ Commands:
 
 - check the [demonstration](https://youtu.be/T6m4OM3nvGc) of using hadoop-benchmark on Grid5000
 
+## Changes for the masterthesis
+
+For an easy use on the masterthesis following changes was made:
+
+- own config `masterthesis` with scenario `selfbalancing-mt` (based on selfbalancing)
+
+- added jobclient tests
+
+- `setup.sh`: easier use to create and control the cluster, based on `cluster.sh`
+
+- `bench.sh`: easier central control to start benchmarks
+
+- `multihost.sh`: startup script to start the cluster w/o docker-machine directly on the host and with docker swarm for an easy made multihost hadoop cluster
