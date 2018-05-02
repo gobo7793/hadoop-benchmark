@@ -284,7 +284,11 @@ stop_host(){
 start(){
     type=$1
     id=$2
-    controllerip=$3
+    if [[ -z "$3" ]]; then
+        controllerip=$(get_controller_ip)
+    else
+        controllerip=$2
+    fi
     
     case "$type" in
         host)
@@ -411,8 +415,9 @@ Start container commands:
 
     start graphite          Starts graphite container
     start controller        Starts controller container
-    start compute <node-id> <controllerip>
-                            Starts given compute container
+    start compute <node-id> [controllerip]
+                            Starts given compute container, if no ip given
+                              the local controller ip will be used
 
 Stopping container commands:
     stop host <number>      Stops all container on host <number>
