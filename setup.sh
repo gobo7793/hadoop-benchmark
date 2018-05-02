@@ -198,6 +198,11 @@ hadoop_cmd(){
     docker $(docker-machine config $CLUSTER_NAME_PREFIX-controller) exec controller "$@"
 }
 
+hdfs_cmd(){
+    docker $(docker-machine config $CLUSTER_NAME_PREFIX-controller) exec controller hdfs "$@"
+    echo $?
+}
+
 console(){
     log "Enter console connected to the cluster"
     
@@ -377,6 +382,7 @@ Hadoop container network commands:
   
 Misc commands:
     cmd <cmd>               executes the given command on hadoop controller
+    hdfs <cmd>              executes the hdfs command and prints the exit code
     
     console                 starts a console container connected to the cluster
     hdfsdl <file>           download the file from HDFS to current directory
@@ -441,6 +447,10 @@ while [[ -z $command ]]; do
             ;;
         cmd)
             command=hadoop_cmd
+            break
+            ;;
+        hdfs)
+            command=hdfs_cmd
             break
             ;;
         console)

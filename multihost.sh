@@ -131,6 +131,23 @@ get_controller_ip(){
         $controller_container_name
 }
 
+ls_hadoop(){
+    log "List running hadoop docker container"
+    
+    docker ps
+}
+
+info_node(){
+    log "Inspecting Node: compute-$1"
+    
+    if [[ -n $2 ]]; then
+        format="-f $2"
+    fi
+    
+    cmd="docker inspect $format $compute_container_name-$1"
+    $cmd
+}
+
 start_consul(){
     run_container $consul_container_name \
         -d \
@@ -348,6 +365,31 @@ net(){
     esac
 }
 
+hadoop_alias(){
+    cmd=$1
+    node=$2
+    format=$3
+    
+    case "$cmd" in
+        start)
+            start_compute $node $(get_controller_ip)
+            ;;
+        stop)
+            stop_compute $node
+            ;;
+        info)
+            if [[ -z "$node" ]]; then
+                ls_hadoop
+            else
+                info_node $node "$format"
+            fi
+            ;;
+        *)
+            unknown_command "hadoop $cmd"
+            ;;
+    esac
+}
+
 print_help(){
 cat << EOM
 Usage: $0 [OPTIONS] COMMAND
@@ -369,15 +411,15 @@ Start container commands:
 
     start graphite          Starts graphite container
     start controller        Starts controller container
-    start compute <id> <controllerip>
+    start compute <node-id> <controllerip>
                             Starts given compute container
 
 Stopping container commands:
-    stop host <number>      Stops all container on host <number>.
+    stop host <number>      Stops all container on host <number>
 
     stop graphite           Stops graphite container
     stop controller         Stops controller container
-    stop compute <id>       Stops given compute container
+    stop compute <node-id>  Stops given compute container
 
 Hadoop container network commands:
     net start <node-id>     Enables networking interfaces on the given node
@@ -389,7 +431,14 @@ Hadoop container network commands:
 Misc commands:
     cmd <cmd>               Executes the given command on hadoop controller
     hdfs <cmd>              Executes the hdfs command and prints the exit code
+    info [node-id] [form]   list running containers or node container details
+                              and can use --format string
     controllerip            Gets the controller ip based on hadoop network
+
+Compatibility aliases based on setup.sh:
+    hadoop start <node>     -> start compute <node-id>
+    hadoop stop <node>      -> stop compute <node-id>
+    hadoop info [id] [form] -> info [node-id] [form]
 
 Notes:
     Only for the local docker container on localhost of the multihost cluster.
@@ -452,8 +501,20 @@ while [[ -z $command ]]; do
             command=hdfs_cmd
             break
             ;;
+        info)
+            if [[ -z "$node" ]]; then
+                command=ls_hadoop
+            else
+                command=info_node
+            fi
+            break
+            ;;
         controllerip)
             command=get_controller_ip
+            break
+            ;;
+        hadoop)
+            command=hadoop_alias
             break
             ;;
         *)
