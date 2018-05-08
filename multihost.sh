@@ -75,10 +75,8 @@ run_container(){
         log "Container $name already running"
     else
         if [[ $status == "exited" ]]; then
-            #log "Container $name exists, removing"
-            #docker rm $name
-            log "Start container: $name"
-            docker start $name
+            log "Container $name exists, removing"
+            docker rm $name
         fi
         log "Run container: $name"
         docker run --name $name $options
