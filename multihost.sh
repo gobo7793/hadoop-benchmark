@@ -48,16 +48,29 @@ check_docker_container() {
 }
 
 build_container(){
+    log "$@"
+    if [[ $1 = "rebuild" ]]; then
+        rebuild=$1
+        shift
+    fi
     name=$1
     shift
     options="$@"
     
     log "Checking status of docker image: $name:latest"
+    build=false
     if ! docker inspect $name:latest > /dev/null 2>&1; then
         log "Docker image $name:latest does not exist, creating..."
-        docker build -t $name $options
+        build=true
     else
         log "Docker image $name:latest exists"
+        if [[ -n $rebuild ]]; then
+            build=true
+        fi
+    fi
+
+    if [[ "$build" = true ]]; then
+        docker build -t $name $options
     fi
 }
 
@@ -180,7 +193,7 @@ stop_graphite(){
 }
 
 build_hadoop(){
-    build_container $HADOOP_IMAGE $HADOOP_IMAGE_DIR
+    build_container $1 $HADOOP_IMAGE $HADOOP_IMAGE_DIR
 }
 
 start_controller(){
@@ -311,16 +324,7 @@ start(){
 }
 
 build(){
-    type=$1
-    
-    case "$type" in
-        hadoop)
-            build_controller
-            ;;
-        *)
-            unknown_command "build $type"
-            ;;
-    esac
+    build_hadoop "rebuild"
 }
 
 stop(){
@@ -405,7 +409,7 @@ Options:
     -q, --quiet             Do not print which commands are executed
 
 Build image commands:
-    build hadoop            Builds hadoop container image
+    build                   Builds hadoop container image
 
 Start container commands:
     start host <number> [controllerip]

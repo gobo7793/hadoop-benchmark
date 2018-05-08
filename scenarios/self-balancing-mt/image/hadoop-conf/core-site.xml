@@ -21,4 +21,10 @@
 		<name>fs.defaultFS</name>
 		<value>hdfs://%CONF_CONTROLLER_HOSTNAME:9000</value>
 	</property>
+
+	<!-- more connection retries -->
+	<property>
+		<name>ipc.client.connect.max.retries</name>
+		<value>10000</value>
+	</property>
 </configuration>
