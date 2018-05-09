@@ -389,20 +389,27 @@ net(){
 hadoop_alias(){
     cmd=$1
     node=$2
-    format=$3
+    if [[ -z "$3" ]]; then
+        formatip=$(get_controller_ip)
+    else
+        formatip=$3
+    fi
     
     case "$cmd" in
         start)
-            start_compute $node $(get_controller_ip)
+            start "compute" $node $formatip
             ;;
         stop)
-            stop_compute $node
+            stop "compute" $node
+            ;;
+        restart)
+            restart "compute" $node $formatip
             ;;
         info)
             if [[ -z "$node" ]]; then
                 ls_hadoop
             else
-                info_node $node "$format"
+                info_node $node "$formatip"
             fi
             ;;
         *)
@@ -467,14 +474,16 @@ Misc commands:
     controllerip            Gets the controller ip based on hadoop network
 
 Compatibility aliases based on setup.sh:
-    hadoop start <node>     -> start compute <node-id>
-    hadoop stop <node>      -> stop compute <node-id>
-    hadoop info [id] [form] -> info [node-id] [form]
+    hadoop start <node> [ip]   -> start compute <node-id> [controllerip]
+    hadoop stop <node>         -> stop compute <node-id>
+    hadoop restart <node> [ip] -> restart compute <node-id> [controllerip]
+    hadoop info [id] [format]  -> info [node-id] [form]
 
 Notes:
     Only for the local docker container on localhost of the multihost cluster.
     Starts NUM_COMPUTE_NODES compute nodes on host 1 and the half count on other
     hosts >1, so (1+hosts/2)*NUM_COMPUTE_NODES compute nodes will be created.
+    On alias commands the ip on start/restart would be ignored by setup.sh.
 
 EOM
 }
