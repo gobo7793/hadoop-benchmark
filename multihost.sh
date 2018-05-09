@@ -110,7 +110,7 @@ create_net(){
 
 destroy_net(){    
     log "Destroy docker overlay network: $network_name"    
-    docker network rm -d overlay --attachable $network_name
+    docker network rm $network_name
 }
 
 start_net(){
