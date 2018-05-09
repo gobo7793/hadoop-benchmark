@@ -65,4 +65,13 @@
 		<name>dfs.journalnode.http-address</name>
 		<value>0.0.0.0:8480</value>
 	</property>
+	<!-- Replication -->
+	<property>
+		<name>dfs.replication</name>
+		<value>4</value>
+	</property>
+	<property>
+		<name>dfs.namenode.replication.min</name>
+		<value>4</value>
+	</property>
 </configuration>
