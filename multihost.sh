@@ -300,7 +300,7 @@ start(){
     if [[ -z "$3" ]]; then
         controllerip=$(get_controller_ip)
     else
-        controllerip=$2
+        controllerip=$3
     fi
     
     case "$type" in
@@ -348,6 +348,19 @@ stop(){
             unknown_command "stop $type"
             ;;
     esac
+}
+
+restart(){
+    type=$1
+    id=$2
+    if [[ -z "$3" ]]; then
+        controllerip=$(get_controller_ip)
+    else
+        controllerip=$3
+    fi
+
+    stop $type $id
+    start $type $id $controllerip
 }
 
 net(){
@@ -430,6 +443,15 @@ Stopping container commands:
     stop controller         Stops controller container
     stop compute <node-id>  Stops given compute container
 
+Restarting container commands:
+    restart host <number> [controllerip]
+                            Restarts all container on host <number>.
+                            Controller ip needed for other hosts than 1.
+
+    restart graphite        Restarts graphite container
+    restart controller      Restarts controller container
+    restart compute <node>  Restarts given compute container
+
 Hadoop container network commands:
     net start <node-id>     Enables networking interfaces on the given node
     net stop <node-id>      Disables networking interfaces on the given node
@@ -496,6 +518,10 @@ while [[ -z $command ]]; do
             ;;
         stop)
             command=stop
+            break
+            ;;
+        restart)
+            command=restart
             break
             ;;
         net)
