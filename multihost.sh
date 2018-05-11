@@ -546,7 +546,7 @@ while [[ -z $command ]]; do
             break
             ;;
         info)
-            if [[ -z "$node" ]]; then
+            if [[ -z "$2" ]]; then
                 command=ls_hadoop
             else
                 command=info_node
