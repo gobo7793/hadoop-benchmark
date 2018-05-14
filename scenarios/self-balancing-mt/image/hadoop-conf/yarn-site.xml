@@ -57,7 +57,7 @@
 	</property>
 	<property>
 		<name>yarn.resourcemanager.container.liveness-monitor.interval-ms</name>
-		<value>10000</value>
+		<value>5000</value>
 	</property>
 	<property>
 		<name>yarn.am.liveness-monitor.expiry-interval-ms</name>
@@ -65,11 +65,11 @@
 	</property>
 	<property>
 		<name>yarn.nodemanager.disk-health-checker.interval-ms</name>
-		<value>10000</value>
+		<value>5000</value>
 	</property>
 	<property>
 		<name>yarn.resourcemanager.connect.retry-interval.ms</name>
-		<value>10000</value>
+		<value>5000</value>
 	</property>
 	
 	<!-- activating timeline server -->

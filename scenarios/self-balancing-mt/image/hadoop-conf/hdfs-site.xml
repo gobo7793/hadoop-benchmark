@@ -70,8 +70,13 @@
 		<name>dfs.replication</name>
 		<value>4</value>
 	</property>
-	<!--<property>
-		<name>dfs.namenode.replication.min</name>
-		<value>4</value>
-	</property>-->
+	<!-- Faster dead detection -->
+	<property>
+		<name>dfs.namenode.heartbeat.recheck-interval</name>
+		<value>1000</value>
+	</property>
+	<property>
+		<name>dfs.heartbeat.interval</name>
+		<value>1</value>
+	</property>
 </configuration>
