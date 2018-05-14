@@ -70,8 +70,8 @@
 		<name>dfs.replication</name>
 		<value>4</value>
 	</property>
-	<property>
+	<!--<property>
 		<name>dfs.namenode.replication.min</name>
 		<value>4</value>
-	</property>
+	</property>-->
 </configuration>
