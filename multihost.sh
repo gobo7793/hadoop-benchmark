@@ -14,10 +14,12 @@ cd "$DIR"
 declare -r docker_name_prefix="$CONTAINER_NAME_PREFIX"
 declare -r network_name='hadoop-net'
 declare -r script_name="$(basename $0)"
-declare -r consul_container_name="$docker_name_prefix""consul"
 declare -r graphite_container_name="$docker_name_prefix""graphite"
 declare -r controller_container_name="$docker_name_prefix""controller"
 declare -r compute_container_name="$docker_name_prefix""compute"
+declare -r graphite_container_ip="10.0.0.4"
+declare -r controller_container_ip="10.0.0.5"
+declare -r compute_container_baseip="10.0.0."
 
 force="false"
 debug="true"
@@ -161,26 +163,13 @@ info_node(){
     $cmd
 }
 
-start_consul(){
-    run_container $consul_container_name \
-        -d \
-        -p 8500:8500 \
-        -h consul \
-        progrium/consul \
-        -server \
-        -bootstrap
-}
-
-stop_consul(){
-    stop_container $consul_container_name
-}
-
 start_graphite(){
     run_container $graphite_container_name \
         -d \
         -h graphite \
         --restart=always \
         --net $network_name \
+        --ip $graphite_container_ip \
         -p 80:80 \
         -p 2003:2003 \
         -p 8125:8125/udp \
@@ -200,6 +189,7 @@ start_controller(){
     run_container $controller_container_name \
         -h controller \
         --net $network_name \
+        --ip $controller_container_ip \
         -p 8088:8088 \
         -p 8188:8188 \
         -p 19888:19888 \
@@ -220,11 +210,13 @@ start_compute(){
     
     http_port=$((8041+$1))
     hdfs_port=$((50074+$1))
+    containerip=$((10+$1))
     
     run_container "$compute_container_name-$1" \
         -h $name \
         --net $network_name \
         --add-host="controller:$controllerip" \
+        --ip "$compute_container_baseip$containerip" \
         -p "$http_port:8042" \
         -p "$hdfs_port:50075" \
         -e "CONF_CONTROLLER_HOSTNAME=controller" \
