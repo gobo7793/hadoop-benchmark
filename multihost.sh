@@ -25,13 +25,13 @@ force="false"
 debug="true"
 
 log() {
-  if [[ "$debug" == "true" ]]; then
+  if [[ "$debug" = true ]]; then
     echo "[$script_name]: $@"
   fi
 }
 
 debug() {
-  [[ "$debug" == "true" ]] && log $@
+  [[ "$debug" = true ]] && log $@
 }
 
 error() {
@@ -96,6 +96,14 @@ run_container(){
         log "Run container: $name"
         docker run --name $name $options
     fi
+log "1"
+}
+
+start_container(){
+    name=$1
+    log "Start container: $name"
+    docker start $name
+log "0"
 }
 
 stop_container(){
@@ -207,6 +215,10 @@ stop_controller(){
 start_compute(){
     name="compute-$1"
     controllerip=$2
+    if [[ "$3" = true ]]; then
+        start_container "$name"
+        return 0
+    fi
     
     http_port=$((8041+$1))
     hdfs_port=$((50074+$1))
@@ -293,6 +305,9 @@ start(){
         controllerip=$(get_controller_ip)
     else
         controllerip=$3
+        if [[ -n "$4" ]]; then
+            soft=true
+        fi
     fi
     
     case "$type" in
@@ -307,7 +322,7 @@ start(){
             log "Controller IP: $(get_controller_ip)"
             ;;
         compute)
-            start_compute $id $controllerip
+            start_compute $id $controllerip $soft
             ;;
         *)
             unknown_command "start $type"
@@ -431,9 +446,10 @@ Start container commands:
 
     start graphite          Starts graphite container
     start controller        Starts controller container
-    start compute <node-id> [controllerip]
+    start compute <node-id> [controllerip] [soft]
                             Starts given compute container, if no ip given
-                              the local controller ip will be used
+                            the local controller ip will be used.
+                            Soft start w/o rm old container only with ip.
 
 Stopping container commands:
     stop host <number>      Stops all container on host <number>
@@ -449,7 +465,10 @@ Restarting container commands:
 
     restart graphite        Restarts graphite container
     restart controller      Restarts controller container
-    restart compute <node>  Restarts given compute container
+    restart compute <node-id> [controllerip] [soft]
+                            Restarts given compute container, if no ip given
+                            the local controller ip will be used.
+                            Soft start w/o rm old container only with ip.
 
 Hadoop container network commands:
     net start <node-id>     Enables networking interfaces on the given node
