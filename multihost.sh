@@ -96,14 +96,12 @@ run_container(){
         log "Run container: $name"
         docker run --name $name $options
     fi
-log "1"
 }
 
 start_container(){
     name=$1
     log "Start container: $name"
     docker start $name
-log "0"
 }
 
 stop_container(){
