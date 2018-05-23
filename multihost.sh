@@ -91,7 +91,7 @@ run_container(){
     else
         if [[ $status == "exited" ]]; then
             log "Container $name exists, removing"
-            docker rm $name
+            docker rm -v $name
         fi
         log "Run container: $name"
         docker run --name $name $options
