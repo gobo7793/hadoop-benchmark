@@ -188,7 +188,15 @@ stop_graphite(){
 }
 
 build_hadoop(){
-    build_container $1 $HADOOP_IMAGE $HADOOP_IMAGE_DIR
+    build_container $1 \
+        "hadoop-benchmark/self-balancing-example" \
+        "scenarios/self-balancing-example/image"
+    build_container $1 \
+        "hadoop-benchmark/self-balancing-mt" \
+        "scenarios/self-balancing-mt/image"
+    build_container $1 \
+        "hadoop-benchmark/self-balancing-mut" \
+        "scenarios/self-balancing-mut/image"
 }
 
 start_controller(){
