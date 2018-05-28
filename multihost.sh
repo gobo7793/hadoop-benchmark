@@ -528,6 +528,7 @@ while [[ -z $command ]]; do
         -c|--config)
             if [[ -e $2 ]]; then
                 CONFIG=$2
+                source $CONFIG
                 log "Using config $2"
             else
                 log "Config file $2 not found"
