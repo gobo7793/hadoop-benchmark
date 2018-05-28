@@ -18,5 +18,5 @@ DRIVER_OPTS_CONSUL='--virtualbox-memory 512'
 NUM_COMPUTE_NODES=1
 
 # docker images to be used
-HADOOP_IMAGE='hadoop-benchmark/self-balancing-example'
-HADOOP_IMAGE_DIR='scenarios/self-balancing-example/image'
+HADOOP_IMAGE='hadoop-benchmark/self-balancing-mt'
+HADOOP_IMAGE_DIR='scenarios/self-balancing-mt/image'
