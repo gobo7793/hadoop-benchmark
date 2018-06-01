@@ -82,3 +82,6 @@ For an easy use on the masterthesis following changes was made:
 - `bench.sh`: compact central control to start benchmarks for working on the masterthesis
 
 - `multihost.sh`: startup script to start/control the cluster w/o docker-machine directly on the host and with docker swarm for an easy made multihost hadoop cluster
+
+- added new scenarios (with configs) for mutation tests used in the masterthesis
+

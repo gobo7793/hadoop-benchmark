@@ -2,6 +2,9 @@
 
 ---
 This is a edited scenario for using in the master thesis. It is based on the mt-image, but has mutated selfbalancing approach.
+
+Mutation test case 3:
+Disable saving new MARP value in hadoop config.
 ---
 
 In this scenario, a new self-balancing approach works along with vanilla Hadoop cluster.

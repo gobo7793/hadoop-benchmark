@@ -1,4 +1,5 @@
 ## The hadoop-benchmark cluster configuration file for the master thesis
+## Mutation test case 2
 
 # the name of the cluster
 CLUSTER_NAME_PREFIX='hadoop'
@@ -21,5 +22,5 @@ DRIVER_OPTS_CONSUL='--virtualbox-memory 512 --virtualbox-boot2docker-url https:/
 NUM_COMPUTE_NODES=4
 
 # docker images to be used
-HADOOP_IMAGE='hadoop-benchmark/self-balancing-mut'
-HADOOP_IMAGE_DIR='scenarios/self-balancing-mut/image'
+HADOOP_IMAGE='hadoop-benchmark/self-balancing-mut2'
+HADOOP_IMAGE_DIR='scenarios/self-balancing-mut2/image'

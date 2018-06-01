@@ -195,8 +195,14 @@ build_hadoop(){
         "hadoop-benchmark/self-balancing-mt" \
         "scenarios/self-balancing-mt/image"
     build_container $1 \
-        "hadoop-benchmark/self-balancing-mut" \
-        "scenarios/self-balancing-mut/image"
+        "hadoop-benchmark/self-balancing-mut1" \
+        "scenarios/self-balancing-mut1/image"
+    build_container $1 \
+        "hadoop-benchmark/self-balancing-mut2" \
+        "scenarios/self-balancing-mut2/image"
+    build_container $1 \
+        "hadoop-benchmark/self-balancing-mut3" \
+        "scenarios/self-balancing-mut3/image"
 }
 
 start_controller(){
