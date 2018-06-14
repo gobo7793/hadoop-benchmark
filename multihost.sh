@@ -309,7 +309,7 @@ stop_host(){
             ((++computeid))
         done
         stop_controller
-        stop_graphite
+        #stop_graphite
     fi
 }
 
