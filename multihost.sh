@@ -169,6 +169,12 @@ info_node(){
     $cmd
 }
 
+get_marp_value(){
+    log "Reading MARP value"
+    hadoop_cmd cat /usr/local/hadoop/etc/hadoop/capacity-scheduler.xml \
+        | grep -oPm1 "(?<=<name>yarn.scheduler.capacity.maximum-am-resource-percent</name><value>)[^<]+"
+}
+
 start_graphite(){
     run_container $graphite_container_name \
         -d \
@@ -468,6 +474,7 @@ Start container commands:
 
 Stopping container commands:
     stop host <number>      Stops all container on host <number>
+                            (except graphite)
 
     stop graphite           Stops graphite container
     stop controller         Stops controller container
@@ -496,8 +503,9 @@ Misc commands:
     cmd <cmd>               Executes the given command on hadoop controller
     hdfs <cmd>              Executes the hdfs command and prints the exit code
     info [node-id] [form]   list running containers or node container details
-                              and can use --format string
+                            and can use --format string
     controllerip            Gets the controller ip based on hadoop network
+    marp                    Gets the current MARP value from hadoop config
 
 Compatibility aliases based on setup.sh:
     hadoop start <node> [ip]   -> start compute <node-id> [controllerip]
@@ -582,6 +590,10 @@ while [[ -z $command ]]; do
             ;;
         controllerip)
             command=get_controller_ip
+            break
+            ;;
+        marp)
+            command=get_marp_value
             break
             ;;
         hadoop)
