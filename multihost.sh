@@ -179,6 +179,7 @@ start_graphite(){
     run_container $graphite_container_name \
         -d \
         -h graphite \
+        --rm \
         --restart=always \
         --net $network_name \
         --ip $graphite_container_ip \
@@ -208,6 +209,7 @@ build_hadoop(){
 start_controller(){
     run_container $controller_container_name \
         -h controller \
+        --rm \
         --net $network_name \
         --ip $controller_container_ip \
         -p 8088:8088 \
@@ -238,6 +240,7 @@ start_compute(){
     
     run_container "$compute_container_name-$1" \
         -h $name \
+        --rm \
         --net $network_name \
         --add-host="controller:$controllerip" \
         --ip "$compute_container_baseip$containerip" \
