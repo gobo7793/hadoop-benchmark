@@ -180,7 +180,6 @@ start_graphite(){
         -d \
         -h graphite \
         --rm \
-        --restart=always \
         --net $network_name \
         --ip $graphite_container_ip \
         -p 80:80 \
