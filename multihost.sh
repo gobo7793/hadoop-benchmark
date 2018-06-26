@@ -200,9 +200,12 @@ build_hadoop(){
     build_container $1 \
         "hadoop-benchmark/self-balancing-mt" \
         "scenarios/self-balancing-mt/image"
-    build_container $1 \
-        "hadoop-benchmark/self-balancing-mut" \
-        "scenarios/self-balancing-mut/image"
+    for dir in scenarios/self-balancing-mut*; do
+        scenario=$(basename $dir)
+        build_container $1 \
+            "hadoop-benchmark/$scenario" \
+            "scenarios/$scenario/image"
+    done
 }
 
 start_controller(){
@@ -450,7 +453,9 @@ Options:
     -q, --quiet             Do not print which commands are executed
 
 Build image commands:
-    build                   Builds hadoop container image
+    build                   Builds the self-balancing-example, the
+                            self-balancing-mt and all scenarios starting
+                            like "self-balancing-mut*"
 
 Start container commands:
     start host <number> [controllerip]
