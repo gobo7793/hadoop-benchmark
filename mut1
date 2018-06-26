@@ -1,0 +1,26 @@
+## The hadoop-benchmark cluster configuration file for the master thesis
+## Mutation test case based on universalmutator
+
+# the name of the cluster
+CLUSTER_NAME_PREFIX='hadoop'
+
+# the name of the multihost cluster
+CONTAINER_NAME_PREFIX=''
+
+# the driver to be used to create the cluster
+# for list of available drivers go to https://docs.docker.com/machine/drivers/
+DRIVER='virtualbox'
+
+# the extra driver options for controller and compute nodes
+# for list of available options `docker-machine create -d virtualbox --help | grep "\-\-virtualbox"`
+DRIVER_OPTS='--virtualbox-memory 2048 --virtualbox-boot2docker-url https://github.com/boot2docker/boot2docker/releases/download/v18.02.0-ce/boot2docker.iso'
+
+# override the memory for consul
+DRIVER_OPTS_CONSUL='--virtualbox-memory 512 --virtualbox-boot2docker-url https://github.com/boot2docker/boot2docker/releases/download/v18.02.0-ce/boot2docker.iso'
+
+# number of compute nodes
+NUM_COMPUTE_NODES=4
+
+# docker images to be used
+HADOOP_IMAGE='hadoop-benchmark/self-balancing-mut1'
+HADOOP_IMAGE_DIR='scenarios/self-balancing-mut1/image'
